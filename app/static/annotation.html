@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>人工标注工作台</title>
+    <link rel="stylesheet" href="/static/css/annotation.css" />
+  </head>
+  <body>
+    <header class="top-navbar">
+      <nav class="nav-left" aria-label="页面导航">
+        <a class="nav-btn" href="/">安全检测</a>
+        <a class="nav-btn active" href="/annotation">人工标注</a>
+      </nav>
+      <div class="nav-title">
+        <h1>安全服安全帽智能检测系统</h1>
+      </div>
+      <div class="nav-right">
+        <span class="status-pill">服务 <strong id="serviceStatus">检查中</strong></span>
+        <span class="status-pill">模型 <strong id="modelStatus">-</strong></span>
+      </div>
+    </header>
+
+    <main class="annotation-shell">
+      <aside class="sidebar left-sidebar">
+        <section class="tool-section">
+          <h2>图片导入</h2>
+          <label class="file-button">
+            <span>上传单张图片</span>
+            <input id="singleImageInput" type="file" accept="image/*" />
+          </label>
+          <label class="file-button">
+            <span>上传图片文件夹</span>
+            <input id="folderInput" type="file" accept="image/*" webkitdirectory directory multiple />
+          </label>
+          <select id="imageSelect" aria-label="图片列表"></select>
+        </section>
+
+        <section class="tool-section">
+          <div class="section-title">
+            <h2>类别管理</h2>
+            <button id="addClassBtn" type="button" class="small">新增</button>
+          </div>
+          <div id="classEditor" class="class-editor"></div>
+          <div class="button-row">
+            <button id="saveClassesBtn" type="button">保存类别</button>
+            <button id="modelClassesBtn" type="button" class="secondary">从模型初始化</button>
+          </div>
+          <label class="file-button yaml-class-button">
+            <span>上传 YAML 生成类别</span>
+            <input id="classYamlInput" type="file" accept=".yaml,.yml" />
+          </label>
+        </section>
+
+        <section class="tool-section">
+          <h2>选择类别</h2>
+          <div id="classButtons" class="class-buttons"></div>
+        </section>
+
+        <section class="tool-section">
+          <h2>标注操作</h2>
+          <div class="action-grid">
+            <button id="saveLabelBtn" type="button">完成/保存标签</button>
+            <button id="undoBtn" type="button" class="secondary">撤销</button>
+            <button id="clearBtn" type="button" class="secondary">清空当前标注</button>
+            <button id="prevBtn" type="button" class="secondary">上一张</button>
+            <button id="nextBtn" type="button" class="secondary">下一张</button>
+            <a id="downloadLabelBtn" class="button-link disabled" href="#">下载当前标签</a>
+            <a id="downloadAllBtn" class="button-link disabled" href="#">下载全部标签</a>
+          </div>
+        </section>
+      </aside>
+
+      <section class="canvas-panel">
+        <div class="canvas-toolbar">
+          <span id="progressText">未加载图片</span>
+          <span id="statusText"></span>
+        </div>
+        <div id="canvasWrap" class="canvas-wrap">
+          <canvas id="annotationCanvas"></canvas>
+          <div id="emptyHint" class="empty-hint">上传图片后开始标注</div>
+        </div>
+      </section>
+
+      <aside class="sidebar info-sidebar">
+        <section class="tool-section">
+          <h2>当前图片</h2>
+          <dl class="info-list">
+            <dt>文件名</dt>
+            <dd id="infoFilename">-</dd>
+            <dt>原始宽高</dt>
+            <dd id="infoSize">-</dd>
+            <dt>标注数量</dt>
+            <dd id="infoBoxCount">0</dd>
+            <dt>批次进度</dt>
+            <dd id="infoProgress">-</dd>
+          </dl>
+        </section>
+
+        <section class="tool-section">
+          <h2>标注框列表</h2>
+          <div id="boxList" class="box-list"></div>
+        </section>
+      </aside>
+    </main>
+
+    <script src="/static/js/annotation.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+[Unit]
+Description=Safety YOLO Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/safety_yolo_web
+Environment="PATH=/opt/safety_yolo_web/.venv/bin"
+EnvironmentFile=-/opt/safety_yolo_web/.env
+ExecStart=/opt/safety_yolo_web/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

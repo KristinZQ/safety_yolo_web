@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>安全服安全帽智能检测系统</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <header class="top-navbar">
+      <nav class="nav-left" aria-label="页面导航">
+        <a class="nav-btn active" href="/">安全检测</a>
+        <a class="nav-btn" href="/annotation">人工标注</a>
+      </nav>
+      <div class="nav-title">
+        <h1>安全服安全帽智能检测系统</h1>
+      </div>
+      <div class="nav-right">
+        <span class="status-pill">服务 <strong id="serviceStatus">检查中</strong></span>
+        <span class="status-pill">模型 <strong id="modelStatus">-</strong></span>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel parameter-panel">
+        <div class="panel-title">
+          <h2>检测参数</h2>
+          <span id="message" class="message"></span>
+        </div>
+        <div class="param-grid">
+          <label>
+            <span>conf</span>
+            <input id="confRange" type="range" min="0.01" max="1" step="0.01" value="0.25" />
+            <input id="confInput" type="number" min="0.01" max="1" step="0.01" value="0.25" />
+          </label>
+          <label>
+            <span>iou</span>
+            <input id="iouInput" type="number" min="0.01" max="1" step="0.01" value="0.45" />
+          </label>
+          <label>
+            <span>imgsz</span>
+            <input id="imgszInput" type="number" min="160" max="2048" step="32" value="640" />
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>图像检测</h2>
+          <button id="detectImageBtn" type="button">开始检测</button>
+        </div>
+        <div class="controls-row">
+          <input id="imageFile" type="file" accept="image/*" multiple />
+          <select id="imageResultSelect" aria-label="图片结果"></select>
+          <a id="imageDownload" class="button-link disabled" href="#" download>下载结果图</a>
+        </div>
+        <div class="media-grid">
+          <figure>
+            <figcaption>原图</figcaption>
+            <img id="sourceImage" alt="原图预览" />
+          </figure>
+          <figure>
+            <figcaption>检测结果</figcaption>
+            <img id="resultImage" alt="检测结果图" />
+          </figure>
+        </div>
+        <div id="imageStats" class="stats-grid"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>类别</th>
+                <th>置信度</th>
+                <th>bbox</th>
+                <th>违规</th>
+              </tr>
+            </thead>
+            <tbody id="imageDetections"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>视频检测</h2>
+          <button id="detectVideoBtn" type="button">上传并检测</button>
+        </div>
+        <div class="controls-row">
+          <input id="videoFile" type="file" accept="video/*" />
+          <progress id="videoProgress" value="0" max="100"></progress>
+          <span id="videoTaskStatus">未开始</span>
+          <a id="videoDownload" class="button-link disabled" href="#" download>下载结果视频</a>
+        </div>
+        <video id="resultVideo" controls></video>
+        <div class="table-wrap">
+          <table>
+            <tbody id="videoSummary"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>实时监控检测</h2>
+          <div class="button-group">
+            <button id="startStreamBtn" type="button">开始检测</button>
+            <button id="stopStreamBtn" type="button" class="secondary">停止检测</button>
+          </div>
+        </div>
+        <div class="controls-row">
+          <label class="stream-source">
+            <span>视频源</span>
+            <input id="streamSource" type="text" value="0" placeholder="0 或 RTSP/HTTP 地址" />
+          </label>
+          <span id="streamStatus">未连接</span>
+        </div>
+        <div class="stream-view">
+          <img id="streamFrame" alt="实时检测画面" />
+        </div>
+        <div id="streamStats" class="stats-grid"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>类别</th>
+                <th>置信度</th>
+                <th>bbox</th>
+                <th>违规</th>
+              </tr>
+            </thead>
+            <tbody id="streamDetections"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel model-panel">
+        <div class="panel-title">
+          <h2>模型管理 / 模型切换</h2>
+          <span id="activeModelText" class="message">当前模型：加载中</span>
+        </div>
+        <div class="model-grid">
+          <label>
+            <span>模型权重</span>
+            <input id="modelWeightFile" type="file" accept=".pt,.pth" />
+          </label>
+          <label>
+            <span>配套 YAML</span>
+            <input id="modelYamlFile" type="file" accept=".yaml,.yml" />
+          </label>
+          <label>
+            <span>模型名称</span>
+            <input id="modelDisplayName" type="text" placeholder="例如：工地安全帽安全服检测模型" />
+          </label>
+          <label>
+            <span>模型类型</span>
+            <select id="modelTypeSelect">
+              <option value="safety_ppe">安全帽安全服检测模型</option>
+              <option value="general">通用目标检测模型</option>
+              <option value="vehicle">车辆检测模型</option>
+              <option value="fire_smoke">火灾烟雾检测模型</option>
+              <option value="custom">自定义检测模型</option>
+            </select>
+          </label>
+          <button id="uploadModelBtn" type="button">上传并解析</button>
+        </div>
+        <div class="model-actions">
+          <label>
+            <span>已注册模型</span>
+            <select id="modelSelect"></select>
+          </label>
+          <button id="saveMappingBtn" type="button">保存映射</button>
+          <button id="activateModelBtn" type="button">激活模型</button>
+          <button id="deleteModelBtn" type="button" class="secondary">删除非默认模型</button>
+        </div>
+        <div class="table-wrap mapping-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>模型标签</th>
+                <th>业务含义</th>
+                <th>报告名称</th>
+                <th>违规</th>
+                <th>违规类型</th>
+              </tr>
+            </thead>
+            <tbody id="mappingTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
